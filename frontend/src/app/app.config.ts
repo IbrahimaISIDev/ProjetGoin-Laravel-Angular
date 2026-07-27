@@ -1,7 +1,7 @@
 import { APP_INITIALIZER, ApplicationConfig, inject, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withViewTransitions } from '@angular/router';
 
 import { routes } from './app.routes';
 import { apiErrorInterceptor } from './core/http/api-error.interceptor';
@@ -16,7 +16,7 @@ function initializeAuth() {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes),
+    provideRouter(routes, withViewTransitions()),
     provideHttpClient(withInterceptors([authInterceptor, apiErrorInterceptor])),
     provideClientHydration(withEventReplay()),
     {
