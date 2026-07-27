@@ -1,0 +1,22 @@
+<header class="app-shell">
+  <div class="brand">
+    <h1>Goin</h1>
+    <p>Gestion simple de tâches</p>
+  </div>
+
+  <nav class="nav-links" aria-label="Navigation principale">
+    @if (currentUser()) {
+      <a routerLink="/tasks">Mes tâches</a>
+      <button type="button" (click)="logout()">Déconnexion</button>
+    } @else {
+      <a routerLink="/login">Connexion</a>
+      <a routerLink="/register">Inscription</a>
+    }
+  </nav>
+</header>
+
+<main class="page-content">
+  <router-outlet />
+</main>
+
+<app-toast-container />
