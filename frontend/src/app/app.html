@@ -1,18 +1,44 @@
 <header class="app-shell">
-  <div class="brand">
-    <h1>Goin</h1>
-    <p>Gestion simple de tâches</p>
-  </div>
+  <div class="app-shell__inner">
+    <a class="brand" routerLink="/">
+      <span class="brand__mark">
+        <svg width="36" height="36" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="48" height="48" rx="12" fill="url(#brandGradient)"/>
+          <path d="M24 14L32 26H16L24 14Z" fill="white"/>
+          <path d="M16 28H32L24 36L16 28Z" fill="white" opacity="0.6"/>
+          <defs>
+            <linearGradient id="brandGradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#6366F1"/>
+              <stop offset="1" stop-color="#A855F7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </span>
+      <span class="brand__text">
+        <span class="brand__name">Goin</span>
+        <span class="brand__tagline">Gestion simple de tâches</span>
+      </span>
+    </a>
 
-  <nav class="nav-links" aria-label="Navigation principale">
-    @if (currentUser()) {
-      <a routerLink="/tasks">Mes tâches</a>
-      <button type="button" (click)="logout()">Déconnexion</button>
-    } @else {
-      <a routerLink="/login">Connexion</a>
-      <a routerLink="/register">Inscription</a>
-    }
-  </nav>
+    <nav class="nav-links" aria-label="Navigation principale">
+      @if (currentUser()) {
+        <a routerLink="/tasks" routerLinkActive="is-active" class="nav-link">Mes tâches</a>
+        <div class="nav-user">
+          <span class="nav-user__avatar">{{ userInitials() }}</span>
+          <span class="nav-user__name">{{ currentUser()?.name }}</span>
+        </div>
+        <button type="button" class="btn-outline btn-logout" (click)="logout()">
+          <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 1L9 17M1 9L9 1L17 9" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180 9 9)"/>
+          </svg>
+          Déconnexion
+        </button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="is-active" class="nav-link">Connexion</a>
+        <a routerLink="/register" routerLinkActive="is-active" class="nav-link nav-link--cta">Inscription</a>
+      }
+    </nav>
+  </div>
 </header>
 
 <main class="page-content">
