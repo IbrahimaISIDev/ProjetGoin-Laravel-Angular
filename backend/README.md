@@ -1,3 +1,14 @@
+## Lancer ce projet en développement
+
+Ce backend est consommé par le frontend Angular du dossier `frontend/`
+via le proxy configuré dans `frontend/proxy.conf.json`, qui cible
+`http://127.0.0.1:8001`. Démarrer le serveur sur ce port précis (et
+non le port 8000 par défaut de `php artisan serve`) :
+
+```bash
+php artisan serve --port=8001
+```
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">
