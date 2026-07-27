@@ -1,13 +1,41 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>Frontend</title>
+  <title>Goin — Gestion simple de tâches</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    /* Critical, inline styles for the boot placeholder below: shown only until
+       Angular bootstraps and replaces the content of <app-root> (either via
+       hydration of server-rendered markup, or by clearing it on the client). */
+    .app-boot-loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #eef2ff 0%, #faf5ff 100%);
+    }
+    .app-boot-loader__spinner {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      border: 3px solid rgba(99, 102, 241, 0.2);
+      border-top-color: #6366f1;
+      animation: app-boot-spin 0.7s linear infinite;
+    }
+    @keyframes app-boot-spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <div class="app-boot-loader" aria-hidden="true">
+      <div class="app-boot-loader__spinner"></div>
+    </div>
+  </app-root>
 </body>
 </html>
