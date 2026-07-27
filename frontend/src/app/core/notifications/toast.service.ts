@@ -1,6 +1,9 @@
 import { Injectable, signal } from '@angular/core';
 import { ToastNotification, ToastType } from './toast-notification.model';
 
+const MAX_VISIBLE_TOASTS = 3;
+const LEAVE_ANIMATION_MS = 200;
+
 @Injectable({ providedIn: 'root' })
 export class ToastService {
   private readonly toasts = signal<ToastNotification[]>([]);
@@ -14,8 +17,11 @@ export class ToastService {
   ): void {
     const id = this.generateId();
     const toast: ToastNotification = { id, type, title, message, duration };
-    
-    this.toasts.update((current) => [...current, toast]);
+
+    this.toasts.update((current) => {
+      const next = [...current, toast];
+      return next.length > MAX_VISIBLE_TOASTS ? next.slice(next.length - MAX_VISIBLE_TOASTS) : next;
+    });
 
     if (duration > 0) {
       setTimeout(() => {
@@ -41,7 +47,13 @@ export class ToastService {
   }
 
   dismiss(id: string): void {
-    this.toasts.update((current) => current.filter((toast) => toast.id !== id));
+    this.toasts.update((current) =>
+      current.map((toast) => (toast.id === id ? { ...toast, leaving: true } : toast)),
+    );
+
+    setTimeout(() => {
+      this.toasts.update((current) => current.filter((toast) => toast.id !== id));
+    }, LEAVE_ANIMATION_MS);
   }
 
   dismissAll(): void {
@@ -49,6 +61,6 @@ export class ToastService {
   }
 
   private generateId(): string {
-    return `toast-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `toast-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
   }
 }

@@ -6,4 +6,5 @@ export interface ToastNotification {
   title: string;
   message?: string;
   duration?: number;
+  leaving?: boolean;
 }

@@ -12,6 +12,8 @@
 }
 
 .toast {
+  position: relative;
+  overflow: hidden;
   pointer-events: auto;
   display: flex;
   align-items: flex-start;
@@ -25,6 +27,11 @@
   min-width: 300px;
 }
 
+.toast--leaving {
+  animation: slideOutRight 0.2s ease-in forwards;
+  pointer-events: none;
+}
+
 @keyframes slideInRight {
   from {
     opacity: 0;
@@ -33,6 +40,17 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
   }
 }
 
@@ -45,6 +63,10 @@
   color: var(--color-success);
 }
 
+.toast--success .toast__progress {
+  background: var(--color-success);
+}
+
 .toast--error {
   border-left: 4px solid var(--color-error);
 }
@@ -52,6 +74,10 @@
 .toast--error .toast__icon {
   background: var(--color-error-light);
   color: var(--color-error);
+}
+
+.toast--error .toast__progress {
+  background: var(--color-error);
 }
 
 .toast--warning {
@@ -63,6 +89,10 @@
   color: var(--color-warning);
 }
 
+.toast--warning .toast__progress {
+  background: var(--color-warning);
+}
+
 .toast--info {
   border-left: 4px solid var(--color-info);
 }
@@ -70,6 +100,26 @@
 .toast--info .toast__icon {
   background: var(--color-info-light);
   color: var(--color-info);
+}
+
+.toast--info .toast__progress {
+  background: var(--color-info);
+}
+
+.toast__progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  opacity: 0.35;
+  animation: toastProgress linear forwards;
+  transform-origin: left;
+}
+
+@keyframes toastProgress {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
 
 .toast__icon {
@@ -127,6 +177,8 @@
 
 @media (max-width: 768px) {
   .toast-container {
+    top: auto;
+    bottom: var(--spacing-4);
     left: var(--spacing-4);
     right: var(--spacing-4);
     max-width: none;
@@ -134,5 +186,27 @@
 
   .toast {
     min-width: auto;
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideOutRight {
+    from {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(16px);
+    }
   }
 }

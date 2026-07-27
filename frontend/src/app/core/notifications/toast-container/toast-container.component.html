@@ -1,7 +1,9 @@
-<div class="toast-container">
-  <div 
-    *ngFor="let toast of toasts()" 
+<div class="toast-container" role="status" aria-live="polite" aria-atomic="false">
+  <div
+    *ngFor="let toast of toasts()"
     class="toast toast--{{ toast.type }}"
+    [class.toast--leaving]="toast.leaving"
+    [attr.role]="toast.type === 'error' ? 'alert' : null"
   >
     <div class="toast__icon">
       <span>{{ getIcon(toast.type) }}</span>
@@ -15,5 +17,10 @@
         <path d="M4 4L12 12M12 4L4 12" stroke-linecap="round"/>
       </svg>
     </button>
+    <span
+      *ngIf="toast.duration && !toast.leaving"
+      class="toast__progress"
+      [style.animation-duration.ms]="toast.duration"
+    ></span>
   </div>
 </div>
