@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -7,6 +7,8 @@ import { AuthService } from '../../../../core/auth/auth.service';
 import { ToastService } from '../../../../core/notifications/toast.service';
 import { Task } from '../../models/task.model';
 import { TasksService } from '../../services/tasks.service';
+
+type TaskFilter = 'all' | 'active' | 'done';
 
 @Component({
   selector: 'app-tasks-page',
@@ -24,14 +26,87 @@ export class TasksPage implements OnInit {
 
   readonly tasks = signal<Task[]>([]);
   readonly loading = signal(false);
+  readonly filter = signal<TaskFilter>('all');
+
+  readonly summary = computed(() => {
+    const all = this.tasks();
+    const done = all.filter((task) => task.is_done).length;
+    return { total: all.length, done, active: all.length - done };
+  });
+
+  readonly filteredTasks = computed(() => {
+    const all = this.tasks();
+    switch (this.filter()) {
+      case 'active':
+        return all.filter((task) => !task.is_done);
+      case 'done':
+        return all.filter((task) => task.is_done);
+      default:
+        return all;
+    }
+  });
+
+  readonly skeletonPlaceholders = [0, 1, 2];
+
+  readonly editingTaskId = signal<number | null>(null);
+  readonly confirmingDeleteId = signal<number | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     title: ['', [Validators.required, Validators.maxLength(255)]],
     description: [''],
   });
 
+  readonly editForm = this.fb.nonNullable.group({
+    title: ['', [Validators.required, Validators.maxLength(255)]],
+    description: [''],
+  });
+
   ngOnInit(): void {
     this.loadTasks();
+  }
+
+  setFilter(filter: TaskFilter): void {
+    this.filter.set(filter);
+  }
+
+  startEdit(task: Task): void {
+    this.confirmingDeleteId.set(null);
+    this.editingTaskId.set(task.id);
+    this.editForm.setValue({
+      title: task.title,
+      description: task.description ?? '',
+    });
+  }
+
+  cancelEdit(): void {
+    this.editingTaskId.set(null);
+  }
+
+  saveEdit(task: Task): void {
+    if (this.editForm.invalid) {
+      this.editForm.markAllAsTouched();
+      return;
+    }
+
+    this.tasksService.update(task.id, this.editForm.getRawValue()).subscribe({
+      next: () => {
+        this.editingTaskId.set(null);
+        this.loadTasks();
+        this.toastService.success('Tâche modifiée', 'Vos changements ont été enregistrés');
+      },
+      error: () => {
+        this.toastService.error('Erreur de modification', 'Impossible de modifier cette tâche');
+      },
+    });
+  }
+
+  askDelete(task: Task): void {
+    this.editingTaskId.set(null);
+    this.confirmingDeleteId.set(task.id);
+  }
+
+  cancelDelete(): void {
+    this.confirmingDeleteId.set(null);
   }
 
   loadTasks(): void {
@@ -89,6 +164,7 @@ export class TasksPage implements OnInit {
   deleteTask(id: number): void {
     this.tasksService.remove(id).subscribe({
       next: () => {
+        this.confirmingDeleteId.set(null);
         this.loadTasks();
         this.toastService.success('Tâche supprimée', 'La tâche a été supprimée avec succès');
       },

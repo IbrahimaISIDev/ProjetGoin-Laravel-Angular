@@ -30,6 +30,26 @@
     </button>
   </header>
 
+  <div class="tasks-page__toolbar" *ngIf="!loading() && summary().total > 0">
+    <p class="tasks-page__summary">
+      {{ summary().total }} tâche{{ summary().total > 1 ? 's' : '' }}
+      · {{ summary().active }} active{{ summary().active > 1 ? 's' : '' }}
+      · {{ summary().done }} terminée{{ summary().done > 1 ? 's' : '' }}
+    </p>
+
+    <div class="task-filters" role="tablist" aria-label="Filtrer les tâches">
+      <button type="button" class="task-filter" [class.is-active]="filter() === 'all'" (click)="setFilter('all')">
+        Toutes ({{ summary().total }})
+      </button>
+      <button type="button" class="task-filter" [class.is-active]="filter() === 'active'" (click)="setFilter('active')">
+        Actives ({{ summary().active }})
+      </button>
+      <button type="button" class="task-filter" [class.is-active]="filter() === 'done'" (click)="setFilter('done')">
+        Terminées ({{ summary().done }})
+      </button>
+    </div>
+  </div>
+
   <form class="task-form" [formGroup]="form" (ngSubmit)="createTask()">
     <div class="task-form__header">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -71,12 +91,11 @@
     </button>
   </form>
 
-  <div class="tasks-page__loading" *ngIf="loading()">
-    <div class="loading-spinner"></div>
-    <p>Chargement de vos tâches...</p>
+  <div class="task-skeleton-list" *ngIf="loading()">
+    <div class="task-skeleton" *ngFor="let i of skeletonPlaceholders"></div>
   </div>
 
-  <div class="tasks-page__empty" *ngIf="!loading() && tasks().length === 0">
+  <div class="tasks-page__empty" *ngIf="!loading() && summary().total === 0">
     <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="32" cy="32" r="32" fill="#E0E7FF"/>
       <path d="M32 20C28.6863 20 26 22.6863 26 26C26 29.3137 28.6863 32 32 32C35.3137 32 38 29.3137 38 26C38 22.6863 35.3137 20 32 20Z" fill="#6366F1"/>
@@ -86,34 +105,86 @@
     <p>Commencez par créer votre première tâche ci-dessus</p>
   </div>
 
-  <ul class="task-list" *ngIf="!loading() && tasks().length > 0">
-    <li *ngFor="let task of tasks()" [class.completed]="task.is_done">
-      <div class="task-content">
-        <label class="task-checkbox" (click)="toggleTask(task)">
-          <div class="checkbox-custom" [class.checked]="task.is_done">
-            <svg *ngIf="task.is_done" width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8L6 11L13 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="task-text">
-            <strong [class.done-text]="task.is_done">{{ task.title }}</strong>
-            <p *ngIf="task.description">{{ task.description }}</p>
-            <small class="task-date">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="6" cy="6" r="5"/>
-                <path d="M6 3V6L8 8"/>
-              </svg>
-              {{ task.created_at | date:'medium' }}
-            </small>
-          </div>
-        </label>
-      </div>
+  <div class="tasks-page__empty" *ngIf="!loading() && summary().total > 0 && filteredTasks().length === 0">
+    <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="32" cy="32" r="32" fill="#E0E7FF"/>
+      <path d="M32 20C28.6863 20 26 22.6863 26 26C26 29.3137 28.6863 32 32 32C35.3137 32 38 29.3137 38 26C38 22.6863 35.3137 20 32 20Z" fill="#6366F1"/>
+      <path d="M22 44C22 39.5817 25.5817 36 30 36H34C38.4183 36 42 39.5817 42 44V46H22V44Z" fill="#6366F1" opacity="0.6"/>
+    </svg>
+    <h3>Aucune tâche dans ce filtre</h3>
+    <p>Essayez un autre filtre pour voir vos tâches</p>
+  </div>
 
-      <button type="button" class="btn-danger" (click)="deleteTask(task.id)" title="Supprimer">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M3 6H15M5 6V14C5 14.5304 5.21071 15.0391 5.58579 15.4142C5.96086 15.7893 6.46957 16 7 16H11C11.5304 16 12.0391 15.7893 12.4142 15.4142C12.7893 15.0391 13 14.5304 13 14V6M8 6V4M8 4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2C10.5304 2 11.0391 2.21071 11.4142 2.58579C11.7893 2.96086 12 3.46957 12 4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
+  <ul class="task-list" *ngIf="!loading() && filteredTasks().length > 0">
+    <li *ngFor="let task of filteredTasks()" [class.completed]="task.is_done" [class.editing]="editingTaskId() === task.id">
+
+      <form
+        class="task-edit-form"
+        *ngIf="editingTaskId() === task.id"
+        [formGroup]="editForm"
+        (ngSubmit)="saveEdit(task)"
+      >
+        <label class="field">
+          <input
+            type="text"
+            formControlName="title"
+            placeholder="Titre de la tâche"
+            [class.error]="editForm.get('title')?.touched && editForm.get('title')?.invalid"
+          />
+          <small class="field-error" *ngIf="editForm.get('title')?.touched && editForm.get('title')?.hasError('required')">
+            Le titre est requis
+          </small>
+        </label>
+        <label class="field">
+          <textarea formControlName="description" placeholder="Description (optionnel)" rows="2"></textarea>
+        </label>
+        <div class="task-edit-form__actions">
+          <button type="submit" class="btn-primary btn-sm" [disabled]="editForm.invalid">Enregistrer</button>
+          <button type="button" class="btn-outline btn-sm" (click)="cancelEdit()">Annuler</button>
+        </div>
+      </form>
+
+      <ng-container *ngIf="editingTaskId() !== task.id">
+        <div class="task-content">
+          <label class="task-checkbox" (click)="toggleTask(task)">
+            <div class="checkbox-custom" [class.checked]="task.is_done">
+              <svg *ngIf="task.is_done" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8L6 11L13 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="task-text">
+              <strong [class.done-text]="task.is_done">{{ task.title }}</strong>
+              <p *ngIf="task.description">{{ task.description }}</p>
+              <small class="task-date">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="6" cy="6" r="5"/>
+                  <path d="M6 3V6L8 8"/>
+                </svg>
+                {{ task.created_at | date:'medium' }}
+              </small>
+            </div>
+          </label>
+        </div>
+
+        <div class="task-actions" *ngIf="confirmingDeleteId() !== task.id">
+          <button type="button" class="btn-icon" (click)="startEdit(task)" title="Modifier">
+            <svg width="16" height="16" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12.5 2.5L15.5 5.5L6 15H3V12L12.5 2.5Z" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <button type="button" class="btn-danger" (click)="askDelete(task)" title="Supprimer">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6H15M5 6V14C5 14.5304 5.21071 15.0391 5.58579 15.4142C5.96086 15.7893 6.46957 16 7 16H11C11.5304 16 12.0391 15.7893 12.4142 15.4142C12.7893 15.0391 13 14.5304 13 14V6M8 6V4M8 4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2C10.5304 2 11.0391 2.21071 11.4142 2.58579C11.7893 2.96086 12 3.46957 12 4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="task-confirm-delete" *ngIf="confirmingDeleteId() === task.id">
+          <span>Supprimer cette tâche ?</span>
+          <button type="button" class="btn-danger btn-sm" (click)="deleteTask(task.id)">Confirmer</button>
+          <button type="button" class="btn-outline btn-sm" (click)="cancelDelete()">Annuler</button>
+        </div>
+      </ng-container>
     </li>
   </ul>
 </section>
