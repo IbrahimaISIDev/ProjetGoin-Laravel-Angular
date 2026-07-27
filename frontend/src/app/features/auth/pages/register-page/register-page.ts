@@ -45,6 +45,8 @@ export class RegisterPage {
 
   readonly loading = signal(false);
   readonly error = signal('');
+  readonly showPassword = signal(false);
+  readonly showPasswordConfirmation = signal(false);
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(255)]],

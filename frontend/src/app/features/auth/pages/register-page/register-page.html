@@ -1,101 +1,149 @@
-<section class="auth-page">
-  <header class="auth-page__header">
-    <div class="auth-page__logo">
-      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="48" height="48" rx="12" fill="url(#gradient1)"/>
-        <path d="M24 14L32 26H16L24 14Z" fill="white"/>
-        <path d="M16 28H32L24 36L16 28Z" fill="white" opacity="0.6"/>
-        <defs>
-          <linearGradient id="gradient1" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#6366F1"/>
-            <stop offset="1" stop-color="#A855F7"/>
-          </linearGradient>
-        </defs>
-      </svg>
+<section class="auth-layout">
+  <aside class="auth-layout__brand">
+    <div class="auth-layout__brand-content">
+      <div class="auth-page__logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="48" height="48" rx="12" fill="rgba(255,255,255,0.15)"/>
+          <path d="M24 14L32 26H16L24 14Z" fill="white"/>
+          <path d="M16 28H32L24 36L16 28Z" fill="white" opacity="0.6"/>
+        </svg>
+      </div>
+      <h2>Rejoignez Goin en quelques secondes</h2>
+      <p>Créez votre espace personnel et commencez à organiser vos tâches dès aujourd'hui.</p>
+      <ul class="auth-layout__features">
+        <li>Inscription gratuite, sans engagement</li>
+        <li>Vos données restent liées à votre seul compte</li>
+        <li>Prise en main immédiate, sans configuration</li>
+      </ul>
     </div>
-    <h1>Créer un compte</h1>
-    <p>Rejoignez-nous pour organiser vos tâches efficacement</p>
-  </header>
+  </aside>
 
-  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
-    <label class="field">
-      <span>Nom complet</span>
-      <input 
-        type="text" 
-        formControlName="name" 
-        placeholder="Jean Dupont"
-        [class.error]="form.get('name')?.touched && form.get('name')?.invalid"
-      />
-      <small class="field-error" *ngIf="form.get('name')?.touched && form.get('name')?.hasError('required')">
-        Le nom est requis
-      </small>
-    </label>
+  <section class="auth-page">
+    <header class="auth-page__header">
+      <h1>Créer un compte</h1>
+      <p>Rejoignez-nous pour organiser vos tâches efficacement</p>
+    </header>
 
-    <label class="field">
-      <span>Adresse email</span>
-      <input 
-        type="email" 
-        formControlName="email" 
-        placeholder="nom@exemple.com"
-        [class.error]="form.get('email')?.touched && form.get('email')?.invalid"
-      />
-      <small class="field-error" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('required')">
-        L'email est requis
-      </small>
-      <small class="field-error" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('email')">
-        Format d'email invalide
-      </small>
-    </label>
+    <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+      <label class="field">
+        <span>Nom complet</span>
+        <input
+          type="text"
+          formControlName="name"
+          placeholder="Jean Dupont"
+          autocomplete="name"
+          [class.error]="form.get('name')?.touched && form.get('name')?.invalid"
+        />
+        <small class="field-error" *ngIf="form.get('name')?.touched && form.get('name')?.hasError('required')">
+          Le nom est requis
+        </small>
+      </label>
 
-    <label class="field">
-      <span>Mot de passe</span>
-      <input 
-        type="password" 
-        formControlName="password" 
-        placeholder="Minimum 8 caractères"
-        [class.error]="form.get('password')?.touched && form.get('password')?.invalid"
-      />
-      <small class="field-error" *ngIf="form.get('password')?.touched && form.get('password')?.hasError('required')">
-        Le mot de passe est requis
-      </small>
-      <small class="field-error" *ngIf="form.get('password')?.touched && form.get('password')?.hasError('minlength')">
-        Le mot de passe doit contenir au moins 8 caractères
-      </small>
-    </label>
+      <label class="field">
+        <span>Adresse email</span>
+        <input
+          type="email"
+          formControlName="email"
+          placeholder="nom@exemple.com"
+          autocomplete="email"
+          [class.error]="form.get('email')?.touched && form.get('email')?.invalid"
+        />
+        <small class="field-error" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('required')">
+          L'email est requis
+        </small>
+        <small class="field-error" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('email')">
+          Format d'email invalide
+        </small>
+      </label>
 
-    <label class="field">
-      <span>Confirmer le mot de passe</span>
-      <input 
-        type="password" 
-        formControlName="password_confirmation" 
-        placeholder="••••••••"
-        [class.error]="form.get('password_confirmation')?.touched && form.get('password_confirmation')?.invalid"
-      />
-      <small class="field-error" *ngIf="form.get('password_confirmation')?.touched && form.get('password_confirmation')?.hasError('required')">
-        La confirmation est requise
-      </small>
-      <small class="field-error" *ngIf="form.get('password_confirmation')?.touched && form.get('password_confirmation')?.hasError('mustMatch')">
-        Les mots de passe ne correspondent pas
-      </small>
-    </label>
+      <label class="field">
+        <span>Mot de passe</span>
+        <div class="password-field">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Minimum 8 caractères"
+            autocomplete="new-password"
+            [class.error]="form.get('password')?.touched && form.get('password')?.invalid"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="showPassword.set(!showPassword())"
+            [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+          >
+            <svg *ngIf="!showPassword()" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="10" r="2.5"/>
+            </svg>
+            <svg *ngIf="showPassword()" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="10" r="2.5"/>
+              <path d="M2 2l16 16" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <small class="field-error" *ngIf="form.get('password')?.touched && form.get('password')?.hasError('required')">
+          Le mot de passe est requis
+        </small>
+        <small class="field-error" *ngIf="form.get('password')?.touched && form.get('password')?.hasError('minlength')">
+          Le mot de passe doit contenir au moins 8 caractères
+        </small>
+      </label>
 
-    <div class="error-message" *ngIf="error()">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-      </svg>
-      <span>{{ error() }}</span>
-    </div>
+      <label class="field">
+        <span>Confirmer le mot de passe</span>
+        <div class="password-field">
+          <input
+            [type]="showPasswordConfirmation() ? 'text' : 'password'"
+            formControlName="password_confirmation"
+            placeholder="••••••••"
+            autocomplete="new-password"
+            [class.error]="form.get('password_confirmation')?.touched && form.get('password_confirmation')?.invalid"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="showPasswordConfirmation.set(!showPasswordConfirmation())"
+            [attr.aria-label]="showPasswordConfirmation() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+          >
+            <svg *ngIf="!showPasswordConfirmation()" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="10" r="2.5"/>
+            </svg>
+            <svg *ngIf="showPasswordConfirmation()" width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M1 10s3.5-6 9-6 9 6 9 6-3.5 6-9 6-9-6-9-6Z" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="10" cy="10" r="2.5"/>
+              <path d="M2 2l16 16" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+        <small class="field-error" *ngIf="form.get('password_confirmation')?.touched && form.get('password_confirmation')?.hasError('required')">
+          La confirmation est requise
+        </small>
+        <small class="field-error" *ngIf="form.get('password_confirmation')?.touched && form.get('password_confirmation')?.hasError('mustMatch')">
+          Les mots de passe ne correspondent pas
+        </small>
+      </label>
 
-    <button type="submit" [disabled]="form.invalid || loading()" class="btn-primary">
-      <span *ngIf="!loading()">Créer mon compte</span>
-      <span *ngIf="loading()" class="loading-spinner">
-        Création en cours...
-      </span>
-    </button>
-  </form>
+      <div class="error-message" *ngIf="error()">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <span>{{ error() }}</span>
+      </div>
 
-  <p class="auth-page__footer">
-    Déjà un compte ?
-    <a routerLink="/login">Se connecter</a>
-  </p>
+      <button type="submit" [disabled]="form.invalid || loading()" class="btn-primary">
+        <span *ngIf="!loading()">Créer mon compte</span>
+        <span *ngIf="loading()" class="loading-spinner">
+          Création en cours...
+        </span>
+      </button>
+    </form>
+
+    <p class="auth-page__footer">
+      Déjà un compte ?
+      <a routerLink="/login">Se connecter</a>
+    </p>
+  </section>
 </section>
