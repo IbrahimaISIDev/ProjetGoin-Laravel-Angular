@@ -1,0 +1,69 @@
+<section class="auth-page">
+  <header class="auth-page__header">
+    <div class="auth-page__logo">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="48" height="48" rx="12" fill="url(#gradient0)"/>
+        <path d="M24 14L32 26H16L24 14Z" fill="white"/>
+        <path d="M16 28H32L24 36L16 28Z" fill="white" opacity="0.6"/>
+        <defs>
+          <linearGradient id="gradient0" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#6366F1"/>
+            <stop offset="1" stop-color="#A855F7"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <h1>Bienvenue</h1>
+    <p>Connectez-vous pour accéder à votre espace de gestion de tâches</p>
+  </header>
+
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field">
+      <span>Adresse email</span>
+      <input 
+        type="email" 
+        formControlName="email" 
+        placeholder="nom@exemple.com"
+        [class.error]="form.get('email')?.touched && form.get('email')?.invalid"
+      />
+      <small class="field-error" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('required')">
+        L'email est requis
+      </small>
+      <small class="field-error" *ngIf="form.get('email')?.touched && form.get('email')?.hasError('email')">
+        Format d'email invalide
+      </small>
+    </label>
+
+    <label class="field">
+      <span>Mot de passe</span>
+      <input 
+        type="password" 
+        formControlName="password" 
+        placeholder="••••••••"
+        [class.error]="form.get('password')?.touched && form.get('password')?.invalid"
+      />
+      <small class="field-error" *ngIf="form.get('password')?.touched && form.get('password')?.hasError('required')">
+        Le mot de passe est requis
+      </small>
+    </label>
+
+    <div class="error-message" *ngIf="error()">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+      </svg>
+      <span>{{ error() }}</span>
+    </div>
+
+    <button type="submit" [disabled]="form.invalid || loading()" class="btn-primary">
+      <span *ngIf="!loading()">Se connecter</span>
+      <span *ngIf="loading()" class="loading-spinner">
+        Connexion en cours...
+      </span>
+    </button>
+  </form>
+
+  <p class="auth-page__footer">
+    Pas encore de compte ?
+    <a routerLink="/register">Créer un compte gratuitement</a>
+  </p>
+</section>
